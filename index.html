@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, #1e1e2f, #28293e);
+            color: #f5f5f5;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: #0a0a23;
+            color: #f5f5f5;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            flex: 1 0 100%;
+            text-align: center;
+        }
+
+        /* Game List */
+        .game-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .game-card {
+            background: #2e2e4a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.5);
+        }
+
+        .game-card:hover h2 {
+            font-weight: bold;
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .game-card h2 {
+            font-size: 1.2rem;
+            margin: 0.5rem;
+            color: #fff;
+        }
+
+        .game-card p {
+            margin: 0.5rem;
+            color: #b3b3cc;
+        }
+
+        /* Game Content Page */
+        .game-page {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            padding: 2rem;
+        }
+
+        .game-page iframe {
+            width: 100%;
+            height: 80vh; /* 80% of the screen height for better visibility */
+            border: none;
+        }
+
+        /* Buttons */
+        .top-button {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: #4e8ef5;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .fullscreen-button {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            background: #f05f5f;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <h1>Game Library</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Game List (Home Page) -->
+        <section class="game-list" id="game-list">
+            <!-- Each game has a unique href attribute for its page -->
+            <a href="#" class="game-card" data-game="game1" data-url="game1.html">
+                <img src="https://via.placeholder.com/300x180" alt="Game 1">
+                <h2>Game Title 1</h2>
+                <p>A short description of Game 1.</p>
+            </a>
+            <a href="#" class="game-card" data-game="game2" data-url="game2.html">
+                <img src="https://via.placeholder.com/300x180" alt="Game 2">
+                <h2>Game Title 2</h2>
+                <p>A short description of Game 2.</p>
+            </a>
+        </section>
+
+        <!-- Game Content Page (hidden initially) -->
+        <div class="game-page" id="game-page">
+            <!-- Home button to return to the game list -->
+            <button class="top-button" id="home-button">Home</button>
+
+            <!-- Title of the game dynamically loaded -->
+            <h2 id="game-title"></h2>
+
+            <!-- Game content loaded in an iframe -->
+            <iframe id="game-content" src=""></iframe>
+
+            <!-- Fullscreen toggle button -->
+            <button class="fullscreen-button" id="fullscreen-button">Toggle Fullscreen</button>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        const gameCards = document.querySelectorAll('.game-card');
+        const gamePage = document.getElementById('game-page');
+        const gameList = document.getElementById('game-list');
+        const gameTitle = document.getElementById('game-title');
+        const gameContent = document.getElementById('game-content');
+        const homeButton = document.getElementById('home-button');
+        const fullscreenButton = document.getElementById('fullscreen-button');
+
+        // Handle clicking on a game card
+        gameCards.forEach(card => {
+            card.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default link behavior
+                const gameUrl = card.getAttribute('data-url'); // Get the URL for the selected game
+                loadGameContent(gameUrl, card.querySelector('h2').textContent); // Load content for the game
+                showGamePage(); // Show the game content page
+            });
+        });
+
+        // Load the content of a selected game based on its URL
+        function loadGameContent(gameUrl, title) {
+            gameTitle.textContent = title; // Set the game title
+            gameContent.src = gameUrl; // Set the iframe source to the URL of the selected game
+        }
+
+        // Show the game content page (hides the game list)
+        function showGamePage() {
+            gameList.style.display = 'none'; // Hide the game list
+            gamePage.style.display = 'flex'; // Show the game content page
+        }
+
+        // Home button functionality (returns to the game list)
+        homeButton.addEventListener('click', () => {
+            gameList.style.display = 'grid'; // Show the game list
+            gamePage.style.display = 'none'; // Hide the game page
+        });
+
+        // Fullscreen button functionality
+        fullscreenButton.addEventListener('click', () => {
+            if (gameContent.requestFullscreen) {
+                gameContent.requestFullscreen();
+            } else if (gameContent.mozRequestFullScreen) { // Firefox
+                gameContent.mozRequestFullScreen();
+            } else if (gameContent.webkitRequestFullscreen) { // Chrome, Safari, Opera
+                gameContent.webkitRequestFullscreen();
+            } else if (gameContent.msRequestFullscreen) { // IE/Edge
+                gameContent.msRequestFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>
